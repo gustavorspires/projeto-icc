@@ -21,49 +21,66 @@ typedef struct{
     char *destino;
 } Passageiro;
 
-void abrirVoo(FILE **arquivo, int *qntAssentos, int *valorEcon, int *valorExe)
+void abrirVoo(int *qntAssentos, int *valorEcon, int *valorExe)
 {
     //antes deve ter a logica do switch para entrar na func com o comando arquivo AV
-    *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
+    FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
 
-    if(*arquivo == NULL){//tratamento em caso de erro;
+    if(arquivo == NULL){//tratamento em caso de erro;
         printf("Erro ao abrir o arquivo\n");
         exit(1);
     }
 
     scanf("%d %d %d", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
 
-    fprintf(*arquivo, "%d %d %d", *qntAssentos, *valorEcon, *valorExe);
+    fprintf(arquivo, "%d %d %d", *qntAssentos, *valorEcon, *valorExe);
     
     fclose(arquivo);//fecha o arquivo
 }
-void realizarReserva(FILE **arquivo, int *qntAssentos){
+void realizarReserva(int *qntAssentos){
     char *str = (char *)malloc(100 * sizeof(char));
-    *arquivo = fopen("abertura_voo.txt", "w");
+    FILE *arquivo = fopen("abertura_voo.txt", "w");
     if(*qntAssentos != 0){
         scanf(" %[^\n]s", str);
         (*qntAssentos)--;
     } else {
-        return 1;
+        exit(1);
     }
+    fclose(arquivo);//fecha o arquivo
     free(str);
-    *str = NULL;
+    str = NULL;
+}
+
+void consultaReserva(){
+
+}
+void modificaReserva(){
+
+}
+void cancelaReserva(){
+
+}
+void fecharDia(){
+
+}
+void fecharVoo(){
+
 }
 
 int main(void)
 {
-    int qntAssentos, valorEcon, valorExe;
-    FILE *arquivo;
+    int *qntAssentos, *valorEcon, *valorExe;
+    FILE **arquivo;
     char str[2];
     scanf("%s ", str);
 
     switch (str[0] + str[1])
     {
     case 151: // Abertura de vôo
-        abrirVoo(arquivo, qntAssentos, valorEcon, valorExe);
+        abrirVoo(qntAssentos, valorEcon, valorExe);
         break;
     case 164: // Realização de reserva
-        realizarReserva(arquivo, qntAssentos);
+        realizarReserva(qntAssentos);
         break;
     case 149: // Consultar reserva
         consultaReserva();
@@ -75,7 +92,7 @@ int main(void)
         cancelaReserva();
         break;
     case 138: // Fechamento de dia
-        fechamentoDia();
+        fecharDia();
         break;
     case 156: // Fechamento de voo
         fecharVoo();

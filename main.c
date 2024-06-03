@@ -9,17 +9,19 @@ typedef struct{
 } Voo;
 
 typedef struct{
-    char *nome;
-    char *sobrenome;
-    char *CPF;
-    char *dataViagem;
-    int numeroVoo;
-    char *assento;
-    char *classe;
-    float valor;
-    char *origem;
-    char *destino;
-} Passageiro;
+    char nome[15];
+    char sobrenome[15];
+    char cpf[12];
+    char dia[3];
+    char mes[3];
+    char ano[5];
+    char numVoo[5];
+    char assento[5];
+    char classe[15];
+    char valor[10];
+    char origem[15];
+    char destino[15];
+}Passageiro;
 
 void abrirVoo(int *qntAssentos, float *valorEcon, float *valorExe)
 {
@@ -59,7 +61,8 @@ void realizarReserva(int *qntAssentos){
 
 void consultaReserva(){
     FILE *arquivo = fopen("abertura_voo.txt", "r");
-    char cpf[15], nome[15], sobrenome[15], dia[3], mes[3], ano[5], numVoo[15], assento[5], classe[15], valor[10], origem[15], destino[15], cpf_consulta[15]; //passar para aloc dinamica dps!!
+    Passageiro *passageiro = (Passageiro *) malloc(sizeof(Passageiro));
+    char *cpf_consulta = (char *)malloc(15 * sizeof(char *)); //passar para aloc dinamica dps!!
 
     // coloca o ponteiro para a segunda linha
     char linha[100];
@@ -69,19 +72,21 @@ void consultaReserva(){
 
     scanf("%s",cpf_consulta);
     //procura o cpf
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", nome, sobrenome, cpf, dia, mes, ano, numVoo, assento, classe, valor, origem, destino) == 12){ //leitura de todas as infos de cada linhas (falta ainda)
+    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino) == 12){ //leitura de todas as infos de cada linhas (falta ainda)
 
-        if(strcmp(cpf, cpf_consulta) == 0){
-            printf("%s\n", cpf);
-            printf("%s %s\n", nome, sobrenome);
-            printf("%s/%s/%s\n", dia, mes, ano);
-            printf("Voo: %s\n", numVoo);
-            printf("Assento: %s\n", assento);
-            printf("Classe: %s\n", classe);
-            printf("Trecho: %s %s\n", origem, destino);
-            printf("Valor: %s\n", valor);
+        if(strcmp(passageiro->cpf, cpf_consulta) == 0){
+            printf("%s\n", passageiro->cpf);
+            printf("%s %s\n", passageiro->nome, passageiro->sobrenome);
+            printf("%s/%s/%s\n", passageiro->dia, passageiro->mes, passageiro->ano);
+            printf("Voo: %s\n", passageiro->numVoo);
+            printf("Assento: %s\n", passageiro->assento);
+            printf("Classe: %s\n", passageiro->classe);
+            printf("Trecho: %s %s\n", passageiro->origem, passageiro->destino);
+            printf("Valor: %s\n", passageiro->valor);
         }
     }
+    fclose(arquivo);
+    free(passageiro);
 }
 
 void modificaReserva(){

@@ -23,7 +23,7 @@ typedef struct{
     char destino[15];
 }Passageiro;
 
-void abrirVoo(int *qntAssentos, float *valorEcon, float *valorExe)
+void abrirVoo()
 {
     //antes deve ter a logica do switch para entrar na func com o comando arquivo AV
     FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
@@ -33,30 +33,54 @@ void abrirVoo(int *qntAssentos, float *valorEcon, float *valorExe)
         exit(1);
     }
 
+    int *qntAssentos = (int *)malloc(sizeof(int));
+    float *valorEcon = (float*)malloc(sizeof(float));
+    float *valorExe = (float*)malloc(sizeof(float));
     scanf("%d %f %f", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
 
     fprintf(arquivo, "%d %.2f %.2f\n", *qntAssentos, *valorEcon, *valorExe);
     
     fclose(arquivo);//fecha o arquivo
+
+    //libera memória alocada
+    free(qntAssentos);
+    qntAssentos = NULL;
+    free(valorEcon);
+    valorEcon = NULL;
+    free(valorExe);
+    valorExe = NULL;
 }
 
-void realizarReserva(int *qntAssentos){
-    char *str = (char *)malloc(100 * sizeof(char)); //alocação dinâmica da string com os dados da reserva
+void realizarReserva(){
     FILE *arquivo = fopen("abertura_voo.txt", "r+");
+
+    fseek(arquivo, 0, SEEK_SET); //move o ponteiro para o início do arquivo
+    int *qntAssentos = (int*)malloc(sizeof(int));
+    fscanf(arquivo, "%d", qntAssentos); //acessa a quantidade de assentos
+
     fseek(arquivo, 0, SEEK_END); //move o ponteiro para o fim do arquivo (para não sobrescrever)
 
     if(*qntAssentos != 0){
+        char *str = (char *)malloc(100 * sizeof(char)); //alocação dinâmica da string com os dados da reserva
         scanf(" %[^\n]s", str);
         fprintf(arquivo, "%s\n", str);
+
         (*qntAssentos)--;
-    } else {
+        fseek(arquivo, 0, SEEK_SET); //move o ponteiro para o início do arquivo
+        fprintf(arquivo, "%d", *qntAssentos); //muda a quantidade de assentos
+
+        //libera memória alocada
+        free(str);
+        str = NULL;
+        free(qntAssentos);
+        qntAssentos = NULL;
+    } 
+    else {
         printf("Nao tem mais assento disponivel"); //mudar isso aqui depois, coloquei só pra debug
         exit(1);
     }
 
     fclose(arquivo);//fecha o arquivo
-    free(str);
-    str = NULL;
 }
 
 void consultaReserva(){
@@ -72,7 +96,7 @@ void consultaReserva(){
 
     scanf("%s",cpf_consulta);
     //procura o cpf
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino) == 12){ //leitura de todas as infos de cada linhas (falta ainda)
+    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino) == 12){ //leitura de todas as infos de cada linhas
 
         if(strcmp(passageiro->cpf, cpf_consulta) == 0){
             printf("%s\n", passageiro->cpf);
@@ -107,8 +131,6 @@ void fecharVoo(){
 
 int main(void)
 {
-    int qntAssentos;
-    float valorEcon, valorExe;
    while(1){
         char str[2];
         scanf("%s", str);
@@ -116,10 +138,10 @@ int main(void)
         switch (str[0] + str[1])
         {
         case 151: // Abertura de vôo
-            abrirVoo(&qntAssentos, &valorEcon, &valorExe);
+            abrirVoo();
             break;
         case 164: // Realização de reserva
-            realizarReserva(&qntAssentos);
+            realizarReserva();
             break;
         case 149: // Consultar reserva
             consultaReserva();

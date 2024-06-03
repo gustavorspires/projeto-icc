@@ -35,7 +35,7 @@ void abrirVoo(int *qntAssentos, float *valorEcon, float *valorExe)
 
     scanf("%d %f %f", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
 
-    fprintf(arquivo, "%d %f %f\n", *qntAssentos, *valorEcon, *valorExe);
+    fprintf(arquivo, "%d %.2f %.2f\n", *qntAssentos, *valorEcon, *valorExe);
     
     fclose(arquivo);//fecha o arquivo
 }

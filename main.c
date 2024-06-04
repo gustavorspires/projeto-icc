@@ -25,7 +25,6 @@ typedef struct{
 
 void abrirVoo()
 {
-    //antes deve ter a logica do switch para entrar na func com o comando arquivo AV
     FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
 
     if(arquivo == NULL){//tratamento em caso de erro;
@@ -86,7 +85,7 @@ void realizarReserva(){
 void consultaReserva(){
     FILE *arquivo = fopen("abertura_voo.txt", "r");
     Passageiro *passageiro = (Passageiro *) malloc(sizeof(Passageiro));
-    char *cpf_consulta = (char *)malloc(15 * sizeof(char *)); //passar para aloc dinamica dps!!
+    char *cpf_consulta = (char *)malloc(15 * sizeof(char)); //passar para aloc dinamica dps!!
 
     // coloca o ponteiro para a segunda linha
     char linha[100];
@@ -114,6 +113,36 @@ void consultaReserva(){
 }
 
 void modificaReserva(){
+    FILE *arquivo = fopen("abertura_voo.txt", "r+");
+    Passageiro *passageiro = (Passageiro *) malloc(sizeof(Passageiro));
+    char *cpf_consulta = (char *)malloc(15 * sizeof(char *)); //passar para aloc dinamica dps!!
+    
+    // coloca o ponteiro para a segunda linha
+    char linha[100];
+    fgets(linha, 100, arquivo);
+    long pos = ftell(arquivo); //retorna posicao atual
+    fseek(arquivo, pos, SEEK_SET);
+
+    scanf("%s",cpf_consulta);
+    //procura o cpf
+   
+       
+    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino) == 12){ //leitura de todas as infos de cada linhas
+        if(strcmp(passageiro->cpf, cpf_consulta) == 0){
+            
+            fseek(arquivo, -sizeof(Passageiro), SEEK_CUR);
+            
+            //esse jeito é o que chega mais perto de sobreescrever fseek(arquivo, -(strlen(passageiro->nome) + strlen(passageiro->sobrenome) + strlen(passageiro->sobrenome) + strlen(passageiro->nome) + strlen(passageiro->nome) + strlen(passageiro->cpf) + strlen(passageiro->dia) + strlen(passageiro->mes) + strlen(passageiro->ano) + strlen(passageiro->numVoo)+ strlen(passageiro->assento)+ strlen(passageiro->classe)+ strlen(passageiro->valor)+ strlen(passageiro->origem)+ strlen(passageiro->destino)), SEEK_CUR);
+
+            scanf("%s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->assento);
+            
+            //sobreescrevendo com as novas infos
+            fprintf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino);
+      
+        }
+    }
+    fclose(arquivo);
+    free(passageiro);
 
 }
 

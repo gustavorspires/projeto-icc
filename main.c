@@ -150,7 +150,31 @@ void modificaReserva() {
 
 
 void cancelaReserva(){
+    FILE *arquivo = fopen("abertura_voo.txt", "r");
+    FILE *temp = fopen("temp.txt", "w"); //criacao arquivo temporario
 
+    Passageiro passageiro;
+    char cpf_consulta[15];
+    
+
+    scanf("%s", cpf_consulta);
+
+    char line[256];
+    
+    fgets(line, sizeof(line), arquivo);
+    fprintf(temp, "%s", line);
+
+    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino) == 12) {
+       if(strcmp(passageiro.cpf, cpf_consulta) != 0) {
+            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
+        }
+    }
+
+    fclose(arquivo);
+    fclose(temp);
+
+    remove("abertura_voo.txt");
+    rename("temp.txt", "abertura_voo.txt");
 }
 
 void fecharDia(){

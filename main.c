@@ -23,31 +23,38 @@ typedef struct{
     char destino[15];
 }Passageiro;
 
-void abrirVoo()
+void abrirVoo(int *var_abrir_voo)
 {
-    FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
+    if (*var_abrir_voo == 0) {
 
-    if(arquivo == NULL){//tratamento em caso de erro;
-        printf("Erro ao abrir o arquivo\n");
-        exit(1);
-    }
+        FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
 
-    int *qntAssentos = (int *)malloc(sizeof(int));
-    float *valorEcon = (float*)malloc(sizeof(float));
-    float *valorExe = (float*)malloc(sizeof(float));
-    scanf("%d %f %f", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
+        if(arquivo == NULL){//tratamento em caso de erro;
+            printf("Erro ao abrir o arquivo\n");
+            exit(1);
+        }
 
-    fprintf(arquivo, "%d %.2f %.2f\n", *qntAssentos, *valorEcon, *valorExe);
-    
-    fclose(arquivo);//fecha o arquivo
+        int *qntAssentos = (int *)malloc(sizeof(int));
+        float *valorEcon = (float*)malloc(sizeof(float));
+        float *valorExe = (float*)malloc(sizeof(float));
+        scanf("%d %f %f", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
 
-    //libera memória alocada
-    free(qntAssentos);
-    qntAssentos = NULL;
-    free(valorEcon);
-    valorEcon = NULL;
-    free(valorExe);
-    valorExe = NULL;
+        fprintf(arquivo, "%d %.2f %.2f\n", *qntAssentos, *valorEcon, *valorExe);
+        
+        fclose(arquivo);//fecha o arquivo
+
+        //libera memória alocada
+        free(qntAssentos);
+        qntAssentos = NULL;
+        free(valorEcon);
+        valorEcon = NULL;
+        free(valorExe);
+        valorExe = NULL;
+
+        (*var_abrir_voo)++;
+        } else {
+            printf("O voo já está aberto! \n");
+        }
 }
 
 void realizarReserva(){
@@ -119,7 +126,6 @@ void modificaReserva() {
     Passageiro passageiro;
     char cpf_consulta[15];
     
-
     scanf("%s", cpf_consulta);
 
     char line[256];
@@ -127,16 +133,13 @@ void modificaReserva() {
     fgets(line, sizeof(line), arquivo);
     fprintf(temp, "%s", line);
 
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino) == 12) {
+    while (fgets(line, sizeof(line), arquivo) != NULL) {
+        sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
         if (strcmp(passageiro.cpf, cpf_consulta) == 0) {
-            
             scanf("%s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.assento);
-
-            // Escreve a nova linha com as informações atualizadas no arquivo temporário
-            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
-        } else {
-            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
         }
+        // Escreve a linha com preservando os tamanhos definidos
+        fprintf(temp, "%-15s %-15s %-12s %-3s %-3s %-5s %-5s %-5s %-15s %-10s %-15s %-15s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
     }
 
     fclose(arquivo);
@@ -144,8 +147,6 @@ void modificaReserva() {
 
     remove("abertura_voo.txt");
     rename("temp.txt", "abertura_voo.txt");
-
-   
 }
 
 
@@ -185,8 +186,9 @@ void fecharVoo(){
 
 }
 
-int main(void)
-{
+int main(void) {
+   int var_abrir_voo = 0;
+
    while(1){
         char str[2];
         scanf("%s", str);
@@ -194,7 +196,7 @@ int main(void)
         switch (str[0] + str[1])
         {
         case 151: // Abertura de vôo
-            abrirVoo();
+            abrirVoo(&var_abrir_voo);
             break;
         case 164: // Realização de reserva
             realizarReserva();

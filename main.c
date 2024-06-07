@@ -126,6 +126,7 @@ void modificaReserva() {
     Passageiro passageiro;
     char cpf_consulta[15];
     
+
     scanf("%s", cpf_consulta);
 
     char line[256];
@@ -133,13 +134,17 @@ void modificaReserva() {
     fgets(line, sizeof(line), arquivo);
     fprintf(temp, "%s", line);
 
-    while (fgets(line, sizeof(line), arquivo) != NULL) {
-        sscanf(line, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
+    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino) == 12) {
         if (strcmp(passageiro.cpf, cpf_consulta) == 0) {
+            
             scanf("%s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.assento);
+
+            // Escreve a nova linha com as informações atualizadas no arquivo temporário
+            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
+        } else {
+            //escreve a linha identica ao arqv original
+            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
         }
-        // Escreve a linha com preservando os tamanhos definidos
-        fprintf(temp, "%-15s %-15s %-12s %-3s %-3s %-5s %-5s %-5s %-15s %-10s %-15s %-15s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
     }
 
     fclose(arquivo);
@@ -147,6 +152,8 @@ void modificaReserva() {
 
     remove("abertura_voo.txt");
     rename("temp.txt", "abertura_voo.txt");
+
+   
 }
 
 

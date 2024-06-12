@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct{
+typedef struct {
     int assentos;
     float valorEconomica;
     float valorExecutiva;
 } Voo;
 
-typedef struct{
+typedef struct {
     char nome[15];
     char sobrenome[15];
     char cpf[12];
@@ -21,209 +21,168 @@ typedef struct{
     char valor[10];
     char origem[15];
     char destino[15];
-}Passageiro;
+} Passageiro;
 
-void abrirVoo(int *var_abrir_voo)
-{
+Passageiro* abrirVoo(int *var_abrir_voo, Voo *voo) {
     if (*var_abrir_voo == 0) {
+        Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro));
 
-        FILE *arquivo = fopen("abertura_voo.txt", "w"); //se o arquivo nao existir, cria o arquivo e abre em modo de escrita
+        FILE *arquivo = fopen("abertura_voo.bin", "wb");
 
-        if(arquivo == NULL){//tratamento em caso de erro;
+        if (arquivo == NULL) {
             printf("Erro ao abrir o arquivo\n");
             exit(1);
         }
 
-        int *qntAssentos = (int *)malloc(sizeof(int));
-        float *valorEcon = (float*)malloc(sizeof(float));
-        float *valorExe = (float*)malloc(sizeof(float));
-        scanf("%d %f %f", qntAssentos, valorEcon, valorExe); //os números precisam ser usados na lógica, então eles sao armazenados em variáveis inteiras;
+        int qntAssentos;
+        float valorEcon;
+        float valorExe;
 
-        fprintf(arquivo, "%d %.2f %.2f\n", *qntAssentos, *valorEcon, *valorExe);
+        // lendo as informacoes do voo
         
-        fclose(arquivo);//fecha o arquivo
+        scanf("%d %f %f", &qntAssentos, &valorEcon, &valorExe);
 
-        //libera memória alocada
-        free(qntAssentos);
-        qntAssentos = NULL;
-        free(valorEcon);
-        valorEcon = NULL;
-        free(valorExe);
-        valorExe = NULL;
+        voo->assentos = qntAssentos;
+        voo->valorEconomica = valorEcon;
+        voo->valorExecutiva = valorExe;
+
+        // passando a struct para o arqv binário
+        fwrite(voo, sizeof(Voo), 1, arquivo);
+        fclose(arquivo);
 
         (*var_abrir_voo)++;
-        } else {
-            printf("O voo já está aberto! \n");
-        }
+        
+        return ptr;
+    } else {
+        printf("O voo já está aberto! \n");
+        return NULL;
+    }
 }
 
-void realizarReserva(){
-    FILE *arquivo = fopen("abertura_voo.txt", "r+");
+Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
+    *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro)); 
 
-    fseek(arquivo, 0, SEEK_SET); //move o ponteiro para o início do arquivo
-    int *qntAssentos = (int*)malloc(sizeof(int));
-    fscanf(arquivo, "%d", qntAssentos); //acessa a quantidade de assentos
-
-    fseek(arquivo, 0, SEEK_END); //move o ponteiro para o fim do arquivo (para não sobrescrever)
-
-    if(*qntAssentos != 0){
-        char *str = (char *)malloc(100 * sizeof(char)); //alocação dinâmica da string com os dados da reserva
-        scanf(" %[^\n]s", str);
-        fprintf(arquivo, "%s\n", str);
-
-        (*qntAssentos)--;
-        fseek(arquivo, 0, SEEK_SET); //move o ponteiro para o início do arquivo
-        fprintf(arquivo, "%d", *qntAssentos); //muda a quantidade de assentos
-
-        //libera memória alocada
-        free(str);
-        str = NULL;
-        free(qntAssentos);
-        qntAssentos = NULL;
-    } 
-    else {
-        printf("Nao tem mais assento disponivel"); //mudar isso aqui depois, coloquei só pra debug
+    if (*ptr == NULL) {
+        printf("Erro ao realocar memória\n");
         exit(1);
     }
 
-    fclose(arquivo);//fecha o arquivo
+    return *ptr;
 }
 
-void consultaReserva(){
-    FILE *arquivo = fopen("abertura_voo.txt", "r");
-    Passageiro *passageiro = (Passageiro *) malloc(sizeof(Passageiro));
-    char *cpf_consulta = (char *)malloc(15 * sizeof(char)); //passar para aloc dinamica dps!!
+void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo) {
 
-    // coloca o ponteiro para a segunda linha
-    char linha[100];
-    fgets(linha, 100, arquivo);
-    long pos = ftell(arquivo);
-    fseek(arquivo, pos, SEEK_SET);
-
-    scanf("%s",cpf_consulta);
-    //procura o cpf
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro->nome, passageiro->sobrenome, passageiro->cpf, passageiro->dia, passageiro->mes, passageiro->ano, passageiro->numVoo, passageiro->assento, passageiro->classe, passageiro->valor, passageiro->origem, passageiro->destino) == 12){ //leitura de todas as infos de cada linhas
-
-        if(strcmp(passageiro->cpf, cpf_consulta) == 0){
-            printf("%s\n", passageiro->cpf);
-            printf("%s %s\n", passageiro->nome, passageiro->sobrenome);
-            printf("%s/%s/%s\n", passageiro->dia, passageiro->mes, passageiro->ano);
-            printf("Voo: %s\n", passageiro->numVoo);
-            printf("Assento: %s\n", passageiro->assento);
-            printf("Classe: %s\n", passageiro->classe);
-            printf("Trecho: %s %s\n", passageiro->origem, passageiro->destino);
-            printf("Valor: %s\n", passageiro->valor);
+    if(voo->assentos != 0){
+        if(*qtd_de_reservas > 0){
+            realoc_vetor_struct(ptr, *qtd_de_reservas);
         }
+
+        scanf("%s %s %s %s %s %s %s %s %s %s %s %s", 
+            (*ptr)[*qtd_de_reservas].nome,
+            (*ptr)[*qtd_de_reservas].sobrenome,
+            (*ptr)[*qtd_de_reservas].cpf,
+            (*ptr)[*qtd_de_reservas].dia,
+            (*ptr)[*qtd_de_reservas].mes,
+            (*ptr)[*qtd_de_reservas].ano,
+            (*ptr)[*qtd_de_reservas].numVoo,
+            (*ptr)[*qtd_de_reservas].assento,
+            (*ptr)[*qtd_de_reservas].classe,
+            (*ptr)[*qtd_de_reservas].valor,
+            (*ptr)[*qtd_de_reservas].origem,
+            (*ptr)[*qtd_de_reservas].destino
+        );
+
+        (*qtd_de_reservas)++;
+        voo->assentos--; 
+    } 
+    else {
+        printf("Nao tem mais assento disponivel\n"); 
+        exit(1);
     }
-    fclose(arquivo);
-    free(passageiro);
+
+    
+}
+
+void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
+    char cpf_consulta[12];
+    int encontrado = 0;
+    scanf("%s", cpf_consulta);
+
+    for(int i = 0; i<qtd_de_reservas; i++){
+        if(strcmp(cpf_consulta, (*ptr)[i].cpf) == 0){
+            encontrado = 1;
+            printf(
+            "%s %s %s %s %s %s %s %s %s %s %s %s", 
+             (*ptr)[i].nome,
+                (*ptr)[i].sobrenome,
+                (*ptr)[i].cpf,
+                (*ptr)[i].dia,
+                (*ptr)[i].mes,
+                (*ptr)[i].ano,
+                (*ptr)[i].numVoo,
+                (*ptr)[i].assento,
+                (*ptr)[i].classe,
+                (*ptr)[i].valor,
+                (*ptr)[i].origem,
+                (*ptr)[i].destino
+            );
+        } 
+    }
+    if(encontrado == 0){
+        printf("CPF inválido");
+    }
 }
 
 void modificaReserva() {
-    FILE *arquivo = fopen("abertura_voo.txt", "r");
-    FILE *temp = fopen("temp.txt", "w"); //criacao arquivo temporario
-
-    Passageiro passageiro;
-    char cpf_consulta[15];
-    
-
-    scanf("%s", cpf_consulta);
-
-    char line[256];
-    // Copia a primeira linha do arquivo original para o temporário
-    fgets(line, sizeof(line), arquivo);
-    fprintf(temp, "%s", line);
-
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino) == 12) {
-        if (strcmp(passageiro.cpf, cpf_consulta) == 0) {
-            
-            scanf("%s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.assento);
-
-            // Escreve a nova linha com as informações atualizadas no arquivo temporário
-            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
-        } else {
-            //escreve a linha identica ao arqv original
-            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
-        }
-    }
-
-    fclose(arquivo);
-    fclose(temp);
-
-    remove("abertura_voo.txt");
-    rename("temp.txt", "abertura_voo.txt");
-
-   
+    // Implementação necessária
 }
 
-
-void cancelaReserva(){
-    FILE *arquivo = fopen("abertura_voo.txt", "r");
-    FILE *temp = fopen("temp.txt", "w"); //criacao arquivo temporario
-
-    Passageiro passageiro;
-    char cpf_consulta[15];
-    
-
-    scanf("%s", cpf_consulta);
-
-    char line[256];
-    
-    fgets(line, sizeof(line), arquivo);
-    fprintf(temp, "%s", line);
-
-    while (fscanf(arquivo, "%s %s %s %s %s %s %s %s %s %s %s %s", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino) == 12) {
-       if(strcmp(passageiro.cpf, cpf_consulta) != 0) {
-            fprintf(temp, "%s %s %s %s %s %s %s %s %s %s %s %s\n", passageiro.nome, passageiro.sobrenome, passageiro.cpf, passageiro.dia, passageiro.mes, passageiro.ano, passageiro.numVoo, passageiro.assento, passageiro.classe, passageiro.valor, passageiro.origem, passageiro.destino);
-        }
-    }
-
-    fclose(arquivo);
-    fclose(temp);
-
-    remove("abertura_voo.txt");
-    rename("temp.txt", "abertura_voo.txt");
+void cancelaReserva() {
+    // Implementação necessária
 }
 
-void fecharDia(){
-
+void fecharDia() {
+    //descarregar structs ate o momento no arqv???
 }
 
-void fecharVoo(){
-
+void fecharVoo() {
+    // Idescarregar structs no aqrv
 }
 
 int main(void) {
    int var_abrir_voo = 0;
+   int qtd_de_reservas = 0;
+   Passageiro *ptr = NULL;
+   Voo voo;
 
    while(1){
-        char str[2];
+        char str[3];
         scanf("%s", str);
 
         switch (str[0] + str[1])
         {
-        case 151: // Abertura de vôo
-            abrirVoo(&var_abrir_voo);
+        case 151: 
+             ptr = abrirVoo(&var_abrir_voo, &voo);
             break;
-        case 164: // Realização de reserva
-            realizarReserva();
+        case 164: 
+            realizarReserva(&qtd_de_reservas, &ptr, &voo);
             break;
-        case 149: // Consultar reserva
-            consultaReserva();
+        case 149: 
+            consultaReserva(&ptr, qtd_de_reservas);
             break;
-        case 159: // Modificação de reserva
+        case 159:  
             modificaReserva();
             break;
-        case 132: // Cancelamento de reserva
+        case 132: 
             cancelaReserva();
             break;
-        case 138: // Fechamento de dia
+        case 138: 
             fecharDia();
             break;
-        case 156: // Fechamento de voo
+        case 156: 
             fecharVoo();
             break;
-        default: // caso nenhuma das condições seja satisfeita
+        default: 
             printf("Comando não identificado.\n--------------------------------------------------\n");
         }
     }

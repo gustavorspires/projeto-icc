@@ -28,8 +28,8 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas); //protót
 Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
     if (*var_abrir_voo == 0) {
         Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro));
-
         *arquivo = fopen("abertura_voo.bin", "wb");
+
         if (*arquivo == NULL) {
             printf("Erro ao abrir o arquivo\n");
             exit(1);
@@ -51,7 +51,7 @@ Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
         return ptr;
 
     } else {
-        printf("O voo já está aberto! \n");
+        printf("Voo já aberto!\n");
         return NULL;
     }
 
@@ -74,7 +74,7 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
 
     if(voo->assentos != 0){
         if(*qtd_de_reservas > 0){
-            realoc_vetor_struct(ptr, *qtd_de_reservas);
+            *ptr = realoc_vetor_struct(ptr, *qtd_de_reservas);
         }
 
         scanf("%s %s %s %s %s %s %s %s %s %s %s %s",
@@ -143,9 +143,9 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     int auxExec = 0;
     for(int i = 0; i< qtd_de_reservas; i++){
         if(strcmp((*ptr)[i].classe, "economica") == 0){
-            auxEcon += 1;
+            auxEcon++;
         } else {
-            auxExec += 1;
+            auxExec++;
         }
     }
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
@@ -195,10 +195,8 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas) {
     }
     printf("--------------------------------------------------\n");
    
-    //enviando os dados para o arquivo
-    *arquivo = fopen("abertura_voo.bin", "wb");
-    fwrite(*ptr, sizeof(Passageiro) , qtd_de_reservas, *arquivo);
-    fclose(*arquivo);
+   *arquivo = fopen("abertura_voo.bin", "wb"); //apaga as linhas ao inves de remover por completo
+
 }
 
 int main(void) {

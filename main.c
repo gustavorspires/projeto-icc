@@ -1,3 +1,20 @@
+/* Autoria:
+    Gabriella Almeida - 15528121
+    nome de vcs
+    nome de vcs
+*/
+/* Objetivo:
+    Este programa gerencia as informações de um voo, armazenando os dados gerais do voo e de cada passageiro.
+    O sistema permite que o usuário abra um voo, possibilitando a efetuação de reservas e enquanto o voo estiver
+    aberto é possível consultar informações sobre as reservas, modificá-las e cancelá-las. Além disso, ao fim de
+    cada dia o usuário pode registrar as informações obtidas no arquivo, e recuperá-las no dia seguinte.
+    O fechamento do voo é expresso pelo comando "FV", onde o usuário além de encerrar as reservas, receberá
+    um relatório acerca das informações de cada passageiro e o valor arrecadado por esse voo.
+    O sistema utiliza arquivos binários para armazenar as informações dos voos e dos passageiros, garantindo
+    que os dados sejam preservados entre as execuções do programa.
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,10 +40,13 @@ typedef struct {
     char destino[15];
 } Passageiro;
 
-void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo); //protótipo da função fecharVoo
+void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo); // Protótipo da função fecharVoo
 
 Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
-    if (*var_abrir_voo == 0) {
+    fseek(*arquivo, 0, SEEK_END); // Move o cursor para o final do arquivo
+    long tamArqv = ftell(*arquivo); // Obtém tamanho do arquivo
+   
+    if (*var_abrir_voo == 0 && tamArqv == 0) { // se o tamanho do arqv for diferente 0, indica que esse voo ja tem reservas e consequentemente, já foi aberto uma vez
         Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro));
 
         *arquivo = fopen("abertura_voo.bin", "wb");
@@ -48,18 +68,19 @@ Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
         voo->valorExecutiva = valorExe;
 
         (*var_abrir_voo)++;
-        
+       
         return ptr;
+       
     } else {
         printf("O voo já está aberto! \n");
         return NULL;
     }
 
-    
+   
 }
 
 Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
-    *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro)); 
+    *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro));
 
     if (*ptr == NULL) {
         printf("Erro ao realocar memória\n");
@@ -75,7 +96,7 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
             realoc_vetor_struct(ptr, *qtd_de_reservas);
         }
 
-        scanf("%s %s %s %s %s %s %s %s %s %s %s %s", 
+        scanf("%s %s %s %s %s %s %s %s %s %s %s %s",
             (*ptr)[*qtd_de_reservas].nome,
             (*ptr)[*qtd_de_reservas].sobrenome,
             (*ptr)[*qtd_de_reservas].cpf,
@@ -91,15 +112,15 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
         );
 
         (*qtd_de_reservas)++;
-        voo->assentos--; 
-    } 
+        voo->assentos--;
+    }
     else {
           printf("Voo Fechado!\n");
         int reservas = *qtd_de_reservas;
         fecharVoo(arquivo, ptr, reservas, voo);  // quantidade de assentos = 0, fechamento automático
     }
 
-    
+   
 }
 
 void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
@@ -111,7 +132,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
         if(strcmp(cpf_consulta, (*ptr)[i].cpf) == 0){
             encontrado = 1;
             printf(
-            "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n", 
+            "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n",
              (*ptr)[i].nome,
                 (*ptr)[i].sobrenome,
                 (*ptr)[i].dia,
@@ -124,7 +145,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
                 (*ptr)[i].destino,
                 (*ptr)[i].valor
             );
-        } 
+        }
     }
     if(encontrado == 0){
         printf("CPF inválido");
@@ -132,7 +153,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
 }
 
 void modificaReserva() {
-    
+   
 }
 
 void cancelaReserva() {
@@ -155,38 +176,45 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     printf("Fechamento do dia:\n");
     printf("Quantidade de reservas: %d\nPosição: %0.2f\n", qtd_de_reservas, total);
     printf("--------------------------------------------------\n");
-    
-    
+   
+   
     if (*arquivo == NULL) {
         printf("Erro ao abrir o arquivo\n");
         exit(1);
     }
+    fwrite(voo, sizeof(Voo), 1, *arquivo);
     fwrite(*ptr, sizeof(Passageiro) ,qtd_de_reservas, *arquivo);
     fclose(*arquivo);
+   
+    // Libera a memória alocada para o vetor de passageiros
+    free(*ptr);
+    // Define o ponteiro como NULL para evitar referências inválidas
+    *ptr = NULL;
+   
     exit(1); //sai do programa no fim do dia
 }
 
-void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reservas){
+void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reservas, Voo *voo) {
     *arquivo = fopen("abertura_voo.bin", "rb");
-
     if (*arquivo == NULL) {
         printf("Erro ao abrir o arquivo\n");
         exit(1);
     }
-
-    
-    fseek(*arquivo, 0, SEEK_END);
-    long fileSize = ftell(*arquivo);
+   
+    fseek(*arquivo, 0, SEEK_END); // Move o cursor para o final do arquivo
+    long tamArqv = ftell(*arquivo); // Tamanho total do arquivo
     rewind(*arquivo);
+   
+    if(tamArqv > 0){ //verificando se o arquivo nao esta vazio
+    *qtd_de_reservas = (tamArqv - sizeof(Voo)) / sizeof(Passageiro); // obtendo num de reservas
 
-    
-    *qtd_de_reservas = fileSize / sizeof(Passageiro); //obtendo num de reservas
+    *ptr = (Passageiro*)malloc((*qtd_de_reservas) * sizeof(Passageiro)); // aloca as structs
 
-    *ptr = (Passageiro*)malloc((*qtd_de_reservas) * sizeof(Passageiro)); //aloc as structs
-
-    // lendo os dados do arquivo 
+    // lendo os dados da struct voo e passageiros do arquivo
+    fread(voo, sizeof(Voo), 1, *arquivo);
     fread(*ptr, sizeof(Passageiro), *qtd_de_reservas, *arquivo);
     fclose(*arquivo);
+    }
 }
 
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) {
@@ -206,58 +234,63 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
    
     for(int i = 0; i<qtd_de_reservas; i++){
         printf(
-        "%s\n%s %s\n%s\nValor Total: %0.2f\n\n",
+        "%s\n%s %s\n%s\n\n",
             (*ptr)[i].cpf,
             (*ptr)[i].nome,
             (*ptr)[i].sobrenome,
-            (*ptr)[i].assento,
-            total
+            (*ptr)[i].assento
         );
     }
+    printf("Valor Total: %0.2f\n", total);
     printf("--------------------------------------------------\n");
    
-   *arquivo = fopen("abertura_voo.bin", "wb"); //apaga as linhas ao inves de remover por completo
-
+   *arquivo = fopen("abertura_voo.bin", "wb");//apaga as linhas ao inves de remover por completo
+    if (*arquivo == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+        exit(1);
+    }
+    fclose(*arquivo);
+    exit(1);
 }
 
 int main(void) {
-   int var_abrir_voo = 0;
-   int qtd_de_reservas = 0;
-   FILE *arquivo = NULL;
-   Passageiro *ptr = NULL;
-   Voo voo;
+    int var_abrir_voo = 0;
+    int qtd_de_reservas = 0;
+    FILE *arquivo = NULL;
+    Passageiro *ptr = NULL;
+    Voo voo;
 
-    recuperando_dados_arqv(&arquivo, &ptr, &qtd_de_reservas);
-  
+    recuperando_dados_arqv(&arquivo, &ptr, &qtd_de_reservas, &voo);
+ 
    while(1){
         char str[3];
         scanf("%s", str);
 
         switch (str[0] + str[1])
         {
-        case 151: 
+        case 151:
              ptr = abrirVoo(&arquivo, &var_abrir_voo, &voo);
             break;
-        case 164: 
+        case 164:
             realizarReserva(&qtd_de_reservas, &ptr, &voo, &arquivo);
             break;
-        case 149: 
+        case 149:
             consultaReserva(&ptr, qtd_de_reservas);
             break;
         case 159:  
             modificaReserva(&ptr);
             break;
-        case 132: 
+        case 132:
             cancelaReserva();
             break;
-        case 138: 
+        case 138:
             fecharDia(&arquivo, &ptr, qtd_de_reservas, &voo);
             break;
-        case 156: 
+        case 156:
             fecharVoo(&arquivo, &ptr, qtd_de_reservas, &voo);
             break;
-        default: 
-            printf("Comando não identificado.\n--------------------------------------------------\n");
+        default:
+            printf("Comando não identificado.\n");
         }
     }
 }

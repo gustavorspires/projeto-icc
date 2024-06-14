@@ -23,11 +23,12 @@ typedef struct {
     char destino[15];
 } Passageiro;
 
-void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas); //protótipo da função fecharVoo
+void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo); //protótipo da função fecharVoo
 
 Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
     if (*var_abrir_voo == 0) {
         Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro));
+
         *arquivo = fopen("abertura_voo.bin", "wb");
 
         if (*arquivo == NULL) {
@@ -47,19 +48,18 @@ Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
         voo->valorExecutiva = valorExe;
 
         (*var_abrir_voo)++;
-       
+        
         return ptr;
-
     } else {
-        printf("Voo já aberto!\n");
+        printf("O voo já está aberto! \n");
         return NULL;
     }
 
-   
+    
 }
 
 Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
-    *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro));
+    *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro)); 
 
     if (*ptr == NULL) {
         printf("Erro ao realocar memória\n");
@@ -69,15 +69,13 @@ Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
     return *ptr;
 }
 
-void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **arquivo) {
-    int reservas = *qtd_de_reservas;
-
+void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **arquivo){
     if(voo->assentos != 0){
         if(*qtd_de_reservas > 0){
-            *ptr = realoc_vetor_struct(ptr, *qtd_de_reservas);
+            realoc_vetor_struct(ptr, *qtd_de_reservas);
         }
 
-        scanf("%s %s %s %s %s %s %s %s %s %s %s %s",
+        scanf("%s %s %s %s %s %s %s %s %s %s %s %s", 
             (*ptr)[*qtd_de_reservas].nome,
             (*ptr)[*qtd_de_reservas].sobrenome,
             (*ptr)[*qtd_de_reservas].cpf,
@@ -93,12 +91,15 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
         );
 
         (*qtd_de_reservas)++;
-        voo->assentos--;
-    }
+        voo->assentos--; 
+    } 
     else {
-        printf("Voo Fechado!\n");
-        fecharVoo(arquivo, ptr, reservas);  // quantidade de assentos = 0, fechamento automatico
+          printf("Voo Fechado!\n");
+        int reservas = *qtd_de_reservas;
+        fecharVoo(arquivo, ptr, reservas, voo);  // quantidade de assentos = 0, fechamento automático
     }
+
+    
 }
 
 void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
@@ -110,7 +111,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
         if(strcmp(cpf_consulta, (*ptr)[i].cpf) == 0){
             encontrado = 1;
             printf(
-            "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n",
+            "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n", 
              (*ptr)[i].nome,
                 (*ptr)[i].sobrenome,
                 (*ptr)[i].dia,
@@ -123,7 +124,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
                 (*ptr)[i].destino,
                 (*ptr)[i].valor
             );
-        }
+        } 
     }
     if(encontrado == 0){
         printf("CPF inválido");
@@ -131,7 +132,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
 }
 
 void modificaReserva() {
-   
+    
 }
 
 void cancelaReserva() {
@@ -139,9 +140,10 @@ void cancelaReserva() {
 }
 
 void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) {
-    int auxEcon = 0;
+     int auxEcon = 0;
     int auxExec = 0;
-    for(int i = 0; i< qtd_de_reservas; i++){
+
+    for(int i = 0; i < qtd_de_reservas; i++){
         if(strcmp((*ptr)[i].classe, "economica") == 0){
             auxEcon++;
         } else {
@@ -150,47 +152,66 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     }
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
 
-    printf("--------------------------------------------------\n");
     printf("Fechamento do dia:\n");
     printf("Quantidade de reservas: %d\nPosição: %0.2f\n", qtd_de_reservas, total);
     printf("--------------------------------------------------\n");
-
+    
+    
+    if (*arquivo == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+        exit(1);
+    }
     fwrite(*ptr, sizeof(Passageiro) ,qtd_de_reservas, *arquivo);
     fclose(*arquivo);
     exit(1); //sai do programa no fim do dia
-   
 }
 
 void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reservas){
     *arquivo = fopen("abertura_voo.bin", "rb");
-    
+
+    if (*arquivo == NULL) {
+        printf("Erro ao abrir o arquivo\n");
+        exit(1);
+    }
+
     
     fseek(*arquivo, 0, SEEK_END);
     long fileSize = ftell(*arquivo);
     rewind(*arquivo);
 
-   
+    
     *qtd_de_reservas = fileSize / sizeof(Passageiro); //obtendo num de reservas
 
     *ptr = (Passageiro*)malloc((*qtd_de_reservas) * sizeof(Passageiro)); //aloc as structs
 
-    // lendo os dados do arquivo
+    // lendo os dados do arquivo 
     fread(*ptr, sizeof(Passageiro), *qtd_de_reservas, *arquivo);
     fclose(*arquivo);
 }
 
-void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas) {
+void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) {
+    int auxEcon = 0;
+    int auxExec = 0;
 
-   printf("--------------------------------------------------\n");
+    for(int i = 0; i < qtd_de_reservas; i++){
+        if(strcmp((*ptr)[i].classe, "economica") == 0){
+            auxEcon++;
+        } else {
+            auxExec++;
+        }
+    }
+    float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
+
    printf("Voo fechado!\n\n");
    
     for(int i = 0; i<qtd_de_reservas; i++){
         printf(
-        "%s\n%s %s\n%s\n\n",
+        "%s\n%s %s\n%s\nValor Total: %0.2f\n\n",
             (*ptr)[i].cpf,
             (*ptr)[i].nome,
             (*ptr)[i].sobrenome,
-            (*ptr)[i].assento
+            (*ptr)[i].assento,
+            total
         );
     }
     printf("--------------------------------------------------\n");
@@ -206,38 +227,36 @@ int main(void) {
    Passageiro *ptr = NULL;
    Voo voo;
 
-   
     recuperando_dados_arqv(&arquivo, &ptr, &qtd_de_reservas);
-   
- 
+  
    while(1){
         char str[3];
         scanf("%s", str);
 
         switch (str[0] + str[1])
         {
-        case 151:
+        case 151: 
              ptr = abrirVoo(&arquivo, &var_abrir_voo, &voo);
             break;
-        case 164:
+        case 164: 
             realizarReserva(&qtd_de_reservas, &ptr, &voo, &arquivo);
             break;
-        case 149:
+        case 149: 
             consultaReserva(&ptr, qtd_de_reservas);
             break;
         case 159:  
             modificaReserva(&ptr);
             break;
-        case 132:
+        case 132: 
             cancelaReserva();
             break;
-        case 138:
+        case 138: 
             fecharDia(&arquivo, &ptr, qtd_de_reservas, &voo);
             break;
-        case 156:
-            fecharVoo(&arquivo, &ptr, qtd_de_reservas);
+        case 156: 
+            fecharVoo(&arquivo, &ptr, qtd_de_reservas, &voo);
             break;
-        default:
+        default: 
             printf("Comando não identificado.\n--------------------------------------------------\n");
         }
     }

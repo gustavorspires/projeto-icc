@@ -43,11 +43,9 @@ typedef struct {
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo); // Protótipo da função fecharVoo
 
 Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
-    fseek(*arquivo, 0, SEEK_END); // Move o cursor para o final do arquivo
-    long tamArqv = ftell(*arquivo); // Obtém tamanho do arquivo
    
-    if (*var_abrir_voo == 0 && tamArqv == 0) { // se o tamanho do arqv for diferente 0, indica que esse voo ja tem reservas e consequentemente, já foi aberto uma vez
-        Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro));
+    if (*var_abrir_voo == 0) { 
+        Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro)); 
 
         *arquivo = fopen("abertura_voo.bin", "wb");
 
@@ -71,12 +69,9 @@ Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
        
         return ptr;
        
-    } else {
-        printf("O voo já está aberto! \n");
-        return NULL;
-    }
+    } 
 
-   
+    return NULL;
 }
 
 Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
@@ -115,7 +110,7 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
         voo->assentos--;
     }
     else {
-          printf("Voo Fechado!\n");
+        printf("Voo Fechado!\n");
         int reservas = *qtd_de_reservas;
         fecharVoo(arquivo, ptr, reservas, voo);  // quantidade de assentos = 0, fechamento automático
     }
@@ -186,10 +181,12 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     fwrite(*ptr, sizeof(Passageiro) ,qtd_de_reservas, *arquivo);
     fclose(*arquivo);
    
-    // Libera a memória alocada para o vetor de passageiros
+    // Libera a memória alocada do vetor de structs de passageiros e da struct voo
     free(*ptr);
-    // Define o ponteiro como NULL para evitar referências inválidas
+    free(voo);
+    // Define os ponteiros como NULL para evitar referências inválidas
     *ptr = NULL;
+    voo = NULL;
    
     exit(1); //sai do programa no fim do dia
 }
@@ -230,7 +227,7 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     }
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
 
-   printf("Voo fechado!\n\n");
+   printf("Voo fechado!\n\n");   
    
     for(int i = 0; i<qtd_de_reservas; i++){
         printf(
@@ -250,6 +247,14 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
         exit(1);
     }
     fclose(*arquivo);
+
+     // Libera a memória alocada do vetor de structs de passageiros e da struct voo
+    free(*ptr);
+    free(voo);
+    // Define os ponteiros como NULL para evitar referências inválidas
+    *ptr = NULL;
+    voo = NULL;
+    
     exit(1);
 }
 

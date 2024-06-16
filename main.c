@@ -138,7 +138,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
             encontrado = 1;
             printf(
             "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n",
-             (*ptr)[i].nome,
+                (*ptr)[i].nome,
                 (*ptr)[i].sobrenome,
                 (*ptr)[i].dia,
                 (*ptr)[i].mes,
@@ -174,7 +174,7 @@ void modificaReserva(Passageiro **ptr, int qtd_de_reservas) {
             printf("Reserva Modificada: \n");
             printf("%s\n", (*ptr)[i].cpf);
             printf("%s %s\n", (*ptr)[i].nome, (*ptr)[i].sobrenome);
-            printf("%s %s %s\n", (*ptr)[i].dia, (*ptr)[i].mes, (*ptr)[i].ano);
+            printf("%s/%s/%s\n", (*ptr)[i].dia, (*ptr)[i].mes, (*ptr)[i].ano);
             printf("Voo: %s\n", (*ptr)[i].numVoo);
             printf("Assento: %s\n", (*ptr)[i].assento);
             printf("Classe: %s\n", (*ptr)[i].classe);
@@ -190,17 +190,17 @@ void modificaReserva(Passageiro **ptr, int qtd_de_reservas) {
     }
 }
 
-void cancelaReserva(Passageiro **ptr, int qtd_de_reservas) {
+void cancelaReserva(Passageiro **ptr, int *qtd_de_reservas) {
     char cpf[14];
 
     scanf("%s", cpf);
 
-    for(int i = 0; i < qtd_de_reservas; i++){
+    for(int i = 0; i < *qtd_de_reservas; i++){
         if(strcmp((*ptr)[i].cpf, cpf) == 0){
-            for(int j = i; j < qtd_de_reservas - 1; j++){
+            for(int j = i; j < *qtd_de_reservas - 1; j++){
                 (*ptr)[j] = (*ptr)[j+1];
             }
-            qtd_de_reservas--;
+            (*qtd_de_reservas)--;
             
         }
     }
@@ -232,9 +232,9 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     fwrite(*ptr, sizeof(Passageiro) ,qtd_de_reservas, *arquivo);
     fclose(*arquivo);
    
-    // Libera a memória alocada do vetor de structs de passageiros e da struct voo
+    // Libera a memória alocada do vetor de structs de passageiros 
     free(*ptr);
-    // Define os ponteiros como NULL para evitar referências inválidas
+    // Define o ponteiro como NULL para evitar referências inválidas
     *ptr = NULL;
     exit(0); //sai do programa no fim do dia
 }
@@ -296,9 +296,9 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     }
     fclose(*arquivo);
 
-     // Libera a memória alocada do vetor de structs de passageiros e da struct voo
+     // Libera a memória alocada do vetor de structs de passageiros 
     free(*ptr);
-    // Define os ponteiros como NULL para evitar referências inválidas
+    // Define o ponteiro como NULL para evitar referências inválidas
     *ptr = NULL;
     exit(0);
 }
@@ -331,7 +331,7 @@ int main(void) {
             modificaReserva(&ptr, qtd_de_reservas);
             break;
         case 132:
-            cancelaReserva(&ptr, qtd_de_reservas);
+            cancelaReserva(&ptr, &qtd_de_reservas);
             break;
         case 138:
             fecharDia(&arquivo, &ptr, qtd_de_reservas, &voo);

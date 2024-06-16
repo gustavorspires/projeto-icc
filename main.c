@@ -42,6 +42,16 @@ typedef struct {
 
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo); // Protótipo da função fecharVoo
 
+//Função para checar se o arquivo existe
+int arq_existe(const char *nome){
+    FILE *fp = fopen(nome, "r");
+    if(fp){
+        fclose(fp);
+        return 1;
+    }
+    return 0;
+}
+
 Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
    
     if (*var_abrir_voo == 0) { 
@@ -78,7 +88,7 @@ Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
     *ptr = realloc(*ptr, (qtd_de_reservas + 1) * sizeof(Passageiro));
 
     if (*ptr == NULL) {
-        printf("Erro ao realocar memória\n");
+        printf("Erro ao realocar memoria\n");
         exit(1);
     }
 
@@ -143,7 +153,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
         }
     }
     if(encontrado == 0){
-        printf("CPF inválido");
+        printf("CPF invalido");
     }
 }
 
@@ -176,7 +186,7 @@ void modificaReserva(Passageiro **ptr, int qtd_de_reservas) {
     }
 
     if (!encontrado) {
-        printf("Reserva não encontrada para o CPF: %s\n", cpf_consulta);
+        printf("Reserva nao encontrada para o CPF: %s\n", cpf_consulta);
     }
 }
 
@@ -191,6 +201,7 @@ void cancelaReserva(Passageiro **ptr, int qtd_de_reservas) {
                 (*ptr)[j] = (*ptr)[j+1];
             }
             qtd_de_reservas--;
+            
         }
     }
 }
@@ -209,7 +220,7 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
 
     printf("Fechamento do dia:\n");
-    printf("Quantidade de reservas: %d\nPosição: %0.2f\n", qtd_de_reservas, total);
+    printf("Quantidade de reservas: %d\nPosicao: %0.2f\n", qtd_de_reservas, total);
     printf("--------------------------------------------------\n");
    
     *arquivo = fopen("abertura_voo.bin", "wb");
@@ -299,9 +310,9 @@ int main(void) {
     Passageiro *ptr = NULL;
     Voo voo;
 
-    recuperando_dados_arqv(&arquivo, &ptr, &qtd_de_reservas, &voo);
+    if(arq_existe("abertura_voo.bin")) recuperando_dados_arqv(&arquivo, &ptr, &qtd_de_reservas, &voo);
  
-   while(1){
+    while(1){
         char str[3];
         scanf("%s", str);
 
@@ -329,7 +340,7 @@ int main(void) {
             fecharVoo(&arquivo, &ptr, qtd_de_reservas, &voo);
             break;
         default:
-            printf("Comando não identificado.\n");
+            printf("Comando nao identificado.\n");
         }
     }
 }

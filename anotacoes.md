@@ -1,7 +1,9 @@
 ## To-do list
-- [ ] Aprender a ler e escrever em arquivos
-- [ ] Fazer as funções para cada condicional 
+- [x] Aprender a ler e escrever em arquivos
+- [x] Fazer as funções para cada condicional 
 - [ ] Documentar o código
+- [ ] Resolver função CA
+- [ ] Como proceder após FV
 
 ## Lógica das funções
 **AV** - Cria o arquivo e o vetor

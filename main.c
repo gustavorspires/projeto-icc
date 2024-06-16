@@ -191,18 +191,23 @@ void modificaReserva(Passageiro **ptr, int qtd_de_reservas) {
 }
 
 void cancelaReserva(Passageiro **ptr, int *qtd_de_reservas) {
+    int encontrado = 0;
     char cpf[14];
 
     scanf("%s", cpf);
 
     for(int i = 0; i < *qtd_de_reservas; i++){
         if(strcmp((*ptr)[i].cpf, cpf) == 0){
+            encontrado = 1;
             for(int j = i; j < *qtd_de_reservas - 1; j++){
                 (*ptr)[j] = (*ptr)[j+1];
             }
             (*qtd_de_reservas)--;
             
         }
+    }
+    if(encontrado == 1){
+        realoc_vetor_struct(ptr, *qtd_de_reservas);
     }
 }
 

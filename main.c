@@ -147,12 +147,52 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas) {
     }
 }
 
-void modificaReserva() {
-   
+void modificaReserva(Passageiro **ptr, int qtd_de_reservas) {
+    char cpf_consulta[15], novo_nome[15], novo_sobrenome[15], novo_cpf[15], novo_assento[4];
+    int encontrado = 1;
+    scanf(" %s %s %s %s %s", cpf_consulta, novo_nome, novo_sobrenome, novo_cpf, novo_assento);
+
+    for (int i = 0; i < qtd_de_reservas; i++){
+        if (strcmp((*ptr)[i].cpf, cpf_consulta) == 0){
+            encontrado = 1;
+
+            strcpy((*ptr)[i].nome, novo_nome);
+            strcpy((*ptr)[i].sobrenome, novo_sobrenome);
+            strcpy((*ptr)[i].cpf, novo_cpf);
+            strcpy((*ptr)[i].assento, novo_assento);
+
+            printf("Reserva Modificada: \n");
+            printf("%s\n", (*ptr)[i].cpf);
+            printf("%s %s\n", (*ptr)[i].nome, (*ptr)[i].sobrenome);
+            printf("%s %s %s\n", (*ptr)[i].dia, (*ptr)[i].mes, (*ptr)[i].ano);
+            printf("Voo: %s\n", (*ptr)[i].numVoo);
+            printf("Assento: %s\n", (*ptr)[i].assento);
+            printf("Classe: %s\n", (*ptr)[i].classe);
+            printf("Trecho: %s %s\n", (*ptr)[i].origem, (*ptr)[i].destino);
+            printf("Valor: %s\n", (*ptr)[i].valor);
+            printf("--------------------------------------------------\n");
+            break;
+        }
+    }
+
+    if (!encontrado) {
+        printf("Reserva não encontrada para o CPF: %s\n", cpf_consulta);
+    }
 }
 
-void cancelaReserva() {
-    // Implementação necessária
+void cancelaReserva(Passageiro **ptr, int qtd_de_reservas) {
+    char cpf[14];
+
+    scanf("%s", cpf);
+
+    for(int i = 0; i < qtd_de_reservas; i++){
+        if(strcmp((*ptr)[i].cpf, cpf) == 0){
+            for(int j = i; j < qtd_de_reservas - 1; j++){
+                (*ptr)[j] = (*ptr)[j+1];
+            }
+            qtd_de_reservas--;
+        }
+    }
 }
 
 void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) {
@@ -172,7 +212,7 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
     printf("Quantidade de reservas: %d\nPosição: %0.2f\n", qtd_de_reservas, total);
     printf("--------------------------------------------------\n");
    
-   
+    *arquivo = fopen("abertura_voo.bin", "wb");
     if (*arquivo == NULL) {
         printf("Erro ao abrir o arquivo\n");
         exit(1);
@@ -183,12 +223,9 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
    
     // Libera a memória alocada do vetor de structs de passageiros e da struct voo
     free(*ptr);
-    free(voo);
     // Define os ponteiros como NULL para evitar referências inválidas
     *ptr = NULL;
-    voo = NULL;
-   
-    exit(1); //sai do programa no fim do dia
+    exit(0); //sai do programa no fim do dia
 }
 
 void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reservas, Voo *voo) {
@@ -250,12 +287,9 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo) 
 
      // Libera a memória alocada do vetor de structs de passageiros e da struct voo
     free(*ptr);
-    free(voo);
     // Define os ponteiros como NULL para evitar referências inválidas
     *ptr = NULL;
-    voo = NULL;
-    
-    exit(1);
+    exit(0);
 }
 
 int main(void) {
@@ -283,10 +317,10 @@ int main(void) {
             consultaReserva(&ptr, qtd_de_reservas);
             break;
         case 159:  
-            modificaReserva(&ptr);
+            modificaReserva(&ptr, qtd_de_reservas);
             break;
         case 132:
-            cancelaReserva();
+            cancelaReserva(&ptr, qtd_de_reservas);
             break;
         case 138:
             fecharDia(&arquivo, &ptr, qtd_de_reservas, &voo);

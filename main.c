@@ -166,7 +166,9 @@ void descarregarDados(FILE *arquivo, Voo *voo, Passageiro *ptr, int qtd_de_reser
     fclose(arquivo);
 }
 
-/* A função realoc_vetor_struct é autoexplicativa, realocando a memória disponibilizada para o vetor de passageiros a depender da quantidade de reservas*/
+/* A função realoc_vetor_struct é autoexplicativa, realocando a memória 
+disponibilizada para o vetor de passageiros a depender da quantidade de
+reservas*/
 
 Passageiro *realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas)
 {
@@ -183,7 +185,9 @@ Passageiro *realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas)
 
 // Funções referentes à execução dos comandos:
 
-/* A função abrirVoo recebe como parâmetro o arquivo, a variável de voo aberto, a struct voo e o vetor de passageiros. Essa função é responsável por abrir voos, abrindo o arquivo e setando os parametros do voo */
+/* A função abrirVoo recebe como parâmetro o arquivo, a variável de voo 
+aberto, a struct voo e o vetor de passageiros. Essa função é responsável por 
+abrir voos, abrindo o arquivo e setando os parametros do voo */
 
 Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas)
 {
@@ -222,7 +226,10 @@ Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_r
     }
 }
 
-/* A função realizarReserva recebe como parâmetro a quantidade de reservas, o arquivo, a estrutura voo e o vetor de passageiros. Essa função é responsável por ler os dados das reservas realizadas e guardá-las no vetor de passageiros, realocando a memória antes para poder guardar todos os dados. */
+/* A função realizarReserva recebe como parâmetro a quantidade de reservas, o 
+arquivo, a estrutura voo e o vetor de passageiros. Essa função é responsável 
+por ler os dados das reservas realizadas e guardá-las no vetor de 
+passageiros, realocando a memória antes para poder guardar todos os dados. */
 
 void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **arquivo)
 {
@@ -263,7 +270,9 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
     }
 }
 
-/* A função consultaReserva recebe como parâmetros a quantidade de reservas e o vetor de passageiros. Ela busca o valor do CPF indicado pelo usuário no vetor de passageiros e, ao localizar, imprime os dados da reserva. */
+/* A função consultaReserva recebe como parâmetros a quantidade de reservas e 
+o vetor de passageiros. Ela busca o valor do CPF indicado pelo usuário no 
+vetor de passageiros e, ao localizar, imprime os dados da reserva. */
 
 void consultaReserva(Passageiro **ptr, int qtd_de_reservas)
 {
@@ -297,7 +306,10 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas)
     }
 }
 
-/* A função modificaReserva recebe como parâmetro a quantidade de reservas, a estrutura voo e o vetor de passageiros. A função consulta o CPF inserido pelo usuário no vetor de passageiros e, ao localizar, altera os dados informados pelo usuário dentro dos parâmetros do vetor. */
+/* A função modificaReserva recebe como parâmetro a quantidade de reservas, a 
+estrutura voo e o vetor de passageiros. A função consulta o CPF inserido pelo 
+usuário no vetor de passageiros e, ao localizar, altera os dados informados 
+pelo usuário dentro dos parâmetros do vetor. */
 
 void modificaReserva(Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
@@ -343,7 +355,10 @@ void modificaReserva(Passageiro **ptr, int qtd_de_reservas, Voo *voo)
     }
 }
 
-/* A função cancelaReserva recebe como parâmetro a quantidade de reservas, a estrutura voo e o vetor de passageiros. A função busca o CPF informado pelo usuário no vetor de passageiros e, ao localizar, move todos os valores sucessores uma casa para trás e realoca a memória. */
+/* A função cancelaReserva recebe como parâmetro a quantidade de reservas, a 
+estrutura voo e o vetor de passageiros. A função busca o CPF informado pelo 
+usuário no vetor de passageiros e, ao localizar, move todos os valores 
+sucessores uma casa para trás e realoca a memória. */
 
 void cancelaReserva(Passageiro **ptr, int *qtd_de_reservas, Voo *voo)
 {
@@ -376,7 +391,11 @@ void cancelaReserva(Passageiro **ptr, int *qtd_de_reservas, Voo *voo)
     }
 }
 
-/* A função fecharDia recebe como parâmetro o arquivo, a quantidade de reservas, a estrutura voo e o vetor de passageiros. A função calcula o valor das passagens e imprime, ao final do dia, a quantidade de reservas realizadas até o momento e o valor total até o fechamento do dia, além de gravar todos os dados no arquivo. */
+/* A função fecharDia recebe como parâmetro o arquivo, a quantidade de 
+reservas, a estrutura voo e o vetor de passageiros. A função calcula o valor 
+das passagens e imprime, ao final do dia, a quantidade de reservas realizadas 
+até o momento e o valor total até o fechamento do dia, além de gravar todos 
+os dados no arquivo. */
 
 void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
@@ -410,7 +429,10 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
     exit(0); // sai do programa no fim do dia
 }
 
-/* A função fecharVoo recebe como parâmetro o arquivo, a quantidade de reservas, a estrutura voo e o vetor de passageiros. A função imprime, ao final do dia, os dados das reservas finalizadas e os guarda no arquivo, liberando as estruturas e finalizando o programa. */
+/* A função fecharVoo recebe como parâmetro o arquivo, a quantidade de 
+reservas, a estrutura voo e o vetor de passageiros. A função imprime, ao 
+final do dia, os dados das reservas finalizadas e os guarda no arquivo, 
+liberando as estruturas e finalizando o programa. */
 
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
@@ -427,7 +449,8 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
     exit(0);
 }
 
-/* A função main inicializa algumas das variáveis, verifica as entradas e executa os comandos a depender do valor ASCII somado das entradas */
+/* A função main inicializa algumas das variáveis, verifica as entradas e 
+executa os comandos a depender do valor ASCII somado das entradas */
 
 int main(void)
 {

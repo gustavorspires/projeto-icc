@@ -26,6 +26,7 @@ typedef struct
     float valorEconomica;
     float valorExecutiva;
     int aberto;
+    int closed;
 } Voo;
 
 typedef struct
@@ -187,8 +188,7 @@ Passageiro *realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas)
 Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas)
 {
 
-    if (*var_abrir_voo == 0)
-    {
+    if(voo->closed != 1){
         Passageiro *ptr = (Passageiro *)malloc(sizeof(Passageiro));
 
         *arquivo = fopen("abertura_voo.bin", "wb");
@@ -214,9 +214,12 @@ Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_r
         voo->aberto = 1;
 
         return ptr;
+    } 
+    else
+    {   
+        printf("Voo fechado!\n");
+        exit(0);
     }
-
-    return NULL;
 }
 
 /* A função realizarReserva recebe como parâmetro a quantidade de reservas, o arquivo, a estrutura voo e o vetor de passageiros. Essa função é responsável por ler os dados das reservas realizadas e guardá-las no vetor de passageiros, realocando a memória antes para poder guardar todos os dados. */
@@ -412,6 +415,7 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
     voo->aberto = 0;
+    voo->closed = 1;
     imprimeVooFechado(*ptr, voo, qtd_de_reservas);
 
     descarregarDados(*arquivo, voo, *ptr, qtd_de_reservas);

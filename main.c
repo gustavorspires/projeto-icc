@@ -47,7 +47,7 @@ void descarregarDados(FILE *arquivo, Voo *voo, Passageiro *ptr, int qtd_de_reser
 Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas);
 void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reservas, Voo *voo);
 
-Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo);
+Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas);
 void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **arquivo);
 void consultaReserva(Passageiro **ptr, int qtd_de_reservas);
 void modificaReserva(Passageiro **ptr, int qtd_de_reservas, Voo *voo);
@@ -143,12 +143,13 @@ Passageiro* realoc_vetor_struct(Passageiro **ptr, int qtd_de_reservas) {
 
 // Funções referentes à execução dos comandos:
 
-Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
+Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas) {
    
     if (*var_abrir_voo == 0) { 
         Passageiro *ptr = (Passageiro *) malloc (sizeof(Passageiro)); 
 
         *arquivo = fopen("abertura_voo.bin", "wb");
+        *qtd_de_reservas = 0;
 
         if (*arquivo == NULL) {
             printf("Erro ao abrir o arquivo\n");
@@ -167,7 +168,7 @@ Passageiro* abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo) {
         voo->valorExecutiva = valorExe;
 
         (*var_abrir_voo)++;
-       voo->aberto = 1;
+        voo->aberto = 1;
 
         return ptr;
        
@@ -360,7 +361,7 @@ int main(void) {
         switch (str[0] + str[1])
         {
         case 151:
-            ptr = abrirVoo(&arquivo, &var_abrir_voo, &voo);
+            ptr = abrirVoo(&arquivo, &var_abrir_voo, &voo, &qtd_de_reservas);
             break;
         case 164:
             realizarReserva(&qtd_de_reservas, &ptr, &voo, &arquivo);

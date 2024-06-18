@@ -1,3 +1,5 @@
+// Projeto de ICC 1
+
 /* Autoria:
     Gabriella Almeida - 15528121
     Beatriz Alves dos Santos - 15588630
@@ -189,7 +191,7 @@ abrir voos, abrindo o arquivo e setando os parametros do voo */
 Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas)
 {
 
-    if(voo->aberto){
+    if(!arq_existe("abertura_voo.bin")){
         Passageiro *ptr = (Passageiro *)malloc(sizeof(Passageiro));
 
         *arquivo = fopen("abertura_voo.bin", "wb");
@@ -428,9 +430,9 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 }
 
 /* A função fecharVoo recebe como parâmetro o arquivo, a quantidade de 
-reservas, a estrutura voo e o vetor de passageiros. A função imprime, ao 
-final do dia, os dados das reservas finalizadas e os guarda no arquivo, 
-liberando as estruturas e finalizando o programa. */
+reservas, a estrutura voo e o vetor de passageiros. A função imprime os
+dados das reservas finalizadas e os guarda no arquivo, liberando as 
+estruturas e finalizando o programa. */
 
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
@@ -447,7 +449,9 @@ void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 }
 
 /* A função main inicializa algumas das variáveis, verifica as entradas e 
-executa os comandos a depender do valor ASCII somado das entradas */
+executa os comandos a depender do valor ASCII, somado das entradas.
+Além disso, a função também verifica a existência do arquivo e se existir, 
+recupera os dados */
 
 int main(void)
 {

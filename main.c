@@ -26,7 +26,6 @@ typedef struct
     float valorEconomica;
     float valorExecutiva;
     int aberto;
-    int closed;
 } Voo;
 
 typedef struct
@@ -190,7 +189,7 @@ abrir voos, abrindo o arquivo e setando os parametros do voo */
 Passageiro *abrirVoo(FILE **arquivo, int *var_abrir_voo, Voo *voo, int *qtd_de_reservas)
 {
 
-    if(voo->closed != 1){
+    if(voo->aberto){
         Passageiro *ptr = (Passageiro *)malloc(sizeof(Passageiro));
 
         *arquivo = fopen("abertura_voo.bin", "wb");
@@ -436,7 +435,6 @@ liberando as estruturas e finalizando o programa. */
 void fecharVoo(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
 {
     voo->aberto = 0;
-    voo->closed = 1;
     imprimeVooFechado(*ptr, voo, qtd_de_reservas);
 
     descarregarDados(*arquivo, voo, *ptr, qtd_de_reservas);

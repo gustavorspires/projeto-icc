@@ -98,7 +98,8 @@ void recuperando_dados_arqv(FILE **arquivo, Passageiro **ptr, int *qtd_de_reserv
 
 /* A função imprimeVooFechado recebe como parâmetros o vetor de passageiros e
 o ponteiro voo, além da quantidade de reservas. Essa função é responsável por
-imprimir os dados dos passageiros após o fechamento do vôo. */
+imprimir os dados dos passageiros. É utilizada após o fechamento do voo e após
+uma tentativa de alterar um voo fechado.*/
 
 void imprimeVooFechado(Passageiro *ptr, Voo *voo, int qtd_de_reservas)
 {
@@ -140,8 +141,7 @@ evitar possíveis erros, recebendo como parâmetro apenas o nome do arquivo. */
 int arq_existe(const char *nome)
 {
     FILE *fp = fopen(nome, "r");
-    if (fp)
-    {
+    if (fp){
         fclose(fp);
         return 1;
     }
@@ -156,8 +156,7 @@ no arquivo. */
 void descarregarDados(FILE *arquivo, Voo *voo, Passageiro *ptr, int qtd_de_reservas)
 {
     arquivo = fopen("abertura_voo.bin", "wb");
-    if (arquivo == NULL)
-    {
+    if (arquivo == NULL){
         printf("Erro ao abrir o arquivo\n");
         exit(1);
     }
@@ -262,10 +261,9 @@ void realizarReserva(int *qtd_de_reservas, Passageiro **ptr, Voo *voo, FILE **ar
             fecharVoo(arquivo, ptr, *qtd_de_reservas, voo); // quantidade de assentos = 0, fechamento automático
         }
     }
-    else
-    { // Voo fechado manualmente
-        while (getchar() != '\n')
-            ;
+    else // Voo fechado manualmente
+    { 
+        while (getchar() != '\n');
         imprimeVooFechado(*ptr, voo, *qtd_de_reservas);
     }
 }
@@ -302,7 +300,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas)
     }
     if (encontrado == 0)
     {
-        printf("CPF invalido");
+        printf("CPF invalido\n");
     }
 }
 
@@ -378,6 +376,7 @@ void cancelaReserva(Passageiro **ptr, int *qtd_de_reservas, Voo *voo)
                     (*ptr)[j] = (*ptr)[j + 1];
                 }
                 (*qtd_de_reservas)--;
+                voo->assentos++;
             }
         }
         if (encontrado == 1)

@@ -119,7 +119,6 @@ void imprimeVooFechado(Passageiro *ptr, Voo *voo, int qtd_de_reservas)
     }
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
 
-    printf("--------------------------------------------------\n");
     printf("Voo fechado!\n\n");
 
     for (int i = 0; i < qtd_de_reservas; i++)
@@ -284,7 +283,8 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas)
         {
             encontrado = 1;
             printf(
-                "%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n",
+                "%s\n%s %s\n%s/%s/%s\nVoo: %s\nAssento: %s\nClasse: %s\nTrecho: %s %s\nValor: %s\n",
+                (*ptr)[i].cpf,
                 (*ptr)[i].nome,
                 (*ptr)[i].sobrenome,
                 (*ptr)[i].dia,
@@ -296,6 +296,7 @@ void consultaReserva(Passageiro **ptr, int qtd_de_reservas)
                 (*ptr)[i].origem,
                 (*ptr)[i].destino,
                 (*ptr)[i].valor);
+            printf("--------------------------------------------------\n");
         }
     }
     if (encontrado == 0)
@@ -414,7 +415,6 @@ void fecharDia(FILE **arquivo, Passageiro **ptr, int qtd_de_reservas, Voo *voo)
     }
     float total = (auxEcon * voo->valorEconomica) + (auxExec * voo->valorExecutiva);
 
-    printf("--------------------------------------------------\n");
     printf("Fechamento do dia:\n");
     printf("Quantidade de reservas: %d\nPosicao: %0.2f\n", qtd_de_reservas, total);
     printf("--------------------------------------------------\n");

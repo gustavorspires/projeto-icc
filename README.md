@@ -2,7 +2,7 @@
 
 ## Integrantes
 - Beatriz Alves dos Santos
-- Gabriella Almeida da Silva
+- Gabriella Almeida
 - Gustavo Ramos Santos Pires
 
 ## Professor Responsável
